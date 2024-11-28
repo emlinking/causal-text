@@ -271,8 +271,11 @@ if __name__ == '__main__':
     print('Oracle:\t%.4f' % out['ate_T'])
     print('Semi-Oracle:\t%.4f' % out['ate_matrix'])
     print('Unadjusted:\t%.4f' % out['unadj_T_proxy'])
-    print('proxy-random:\t%.4f' % (args.ptype, out['ate_T_proxy_random']))
-    print('proxy-lex:\t%.4f' % (args.ptype, out['ate_T_proxy']))
+
+    # fixed the following 2 print statements
+    print('proxy-random:\t%.4f' % (out['ate_T_proxy_random']))
+    print('proxy-lex:\t%.4f' % (out['ate_T_proxy']))
+    
     print('T-boost reg:\t%.4f' % out['ate_T_plus_reg'])
     print('T-boost pu:\t%.4f' % out['ate_T_plus_pu'])
     print('W adjust:\t%.4f' % out['ate_cb_T_proxy'])
