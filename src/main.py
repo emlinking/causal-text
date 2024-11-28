@@ -22,6 +22,9 @@ import util
 
 import CausalBert
 
+# added to save CATE estimates
+import pickle
+
 def prepare_covariates(df, 
     stopwords=None,
     vocab_size=2000,
@@ -172,40 +175,40 @@ def run_experiment(args):
 
     ATE_estimates = []
 
-    if 'T_true' in df:
-        ATE_estimates.append(
-            ('unadj_T', util.ATE_unadjusted(df.T_true, df.Y_sim)))
-        ATE_estimates.append(
-            ('ate_T', util.ATE_adjusted(df.C_true, df.T_true, df.Y_sim))
-        )
-        ATE_estimates.append(
-            ('ate_matrix', util.ATE_matrix(df.T_true, df.T_proxy, df.C_true, df.Y_sim))
-        )
+    #if 'T_true' in df:
+        #ATE_estimates.append(
+        #    ('unadj_T', util.ATE_unadjusted(df.T_true, df.Y_sim)))
+        #ATE_estimates.append(
+        #    ('ate_T', util.ATE_adjusted(df.C_true, df.T_true, df.Y_sim))
+        #)
+        #ATE_estimates.append(
+        #    ('ate_matrix', util.ATE_matrix(df.T_true, df.T_proxy, df.C_true, df.Y_sim))
+        #)
 
     if 'T_proxy' in df:
-        ATE_estimates.append(
-            ('unadj_T_proxy', util.ATE_unadjusted(df.T_proxy, df.Y_sim)))
-        ATE_estimates.append(
-            ('ate_T_proxy', util.ATE_adjusted(df.C_true, df.T_proxy, df.Y_sim)))
+        #ATE_estimates.append(
+        #    ('unadj_T_proxy', util.ATE_unadjusted(df.T_proxy, df.Y_sim)))
+        #ATE_estimates.append(
+        #    ('ate_T_proxy', util.ATE_adjusted(df.C_true, df.T_proxy, df.Y_sim)))
 
         ATE_T_plus_reg, T_plus_reg = run_label_expansion(df, args, 
             inner_alpha=args.ina, outer_alpha=args.outa, threshold=args.thre)
         ATE_estimates.append(('ate_T_plus_reg', ATE_T_plus_reg))
 
-        ATE_T_plus_pu, T_plus_pu = run_label_expansion(df, args, single_class=True, 
-            inner_alpha=args.ina, outer_alpha=args.outa, threshold=args.thre)
-        ATE_estimates.append(('ate_T_plus_pu', ATE_T_plus_pu))
+        #ATE_T_plus_pu, T_plus_pu = run_label_expansion(df, args, single_class=True, 
+        #    inner_alpha=args.ina, outer_alpha=args.outa, threshold=args.thre)
+        #ATE_estimates.append(('ate_T_plus_pu', ATE_T_plus_pu))
 
         if args.run_cb:
-            cbw = CausalBert.CausalBertWrapper(g_weight=args.g_weight, Q_weight=args.Q_weight, mlm_weight=args.mlm_weight)
-            cbw.train(df['text'], df.C_true, df.T_proxy, df.Y_sim, epochs=3)
-            ATE_cb_Tproxy = cbw.ATE(df.C_true, df['text'], Y=df.Y_sim, platt_scaling=False)
-            ATE_estimates.append(('ate_cb_T_proxy', ATE_cb_Tproxy))
+            #cbw = CausalBert.CausalBertWrapper(g_weight=args.g_weight, Q_weight=args.Q_weight, mlm_weight=args.mlm_weight)
+            #cbw.train(df['text'], df.C_true, df.T_proxy, df.Y_sim, epochs=3)
+            #ATE_cb_Tproxy = cbw.ATE(df.C_true, df['text'], Y=df.Y_sim, platt_scaling=False)
+            #ATE_estimates.append(('ate_cb_T_proxy', ATE_cb_Tproxy))
 
-            cbw = CausalBert.CausalBertWrapper(g_weight=args.g_weight, Q_weight=args.Q_weight, mlm_weight=args.mlm_weight)
-            cbw.train(df['text'], df.C_true, T_plus_pu, df.Y_sim, epochs=3)
-            ATE_cb_Tplus = cbw.ATE(df.C_true, df['text'], Y=df.Y_sim, platt_scaling=False)
-            ATE_estimates.append(('ate_cb_T_plus_pu', ATE_cb_Tplus))
+            #cbw = CausalBert.CausalBertWrapper(g_weight=args.g_weight, Q_weight=args.Q_weight, mlm_weight=args.mlm_weight)
+            #cbw.train(df['text'], df.C_true, T_plus_pu, df.Y_sim, epochs=3)
+            #ATE_cb_Tplus = cbw.ATE(df.C_true, df['text'], Y=df.Y_sim, platt_scaling=False)
+            #ATE_estimates.append(('ate_cb_T_plus_pu', ATE_cb_Tplus))
 
             cbw = CausalBert.CausalBertWrapper(g_weight=args.g_weight, Q_weight=args.Q_weight, mlm_weight=args.mlm_weight)
             cbw.train(df['text'], df.C_true, T_plus_reg, df.Y_sim, epochs=3)
@@ -242,6 +245,8 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=str, default='420', help='Path to dataset')
     parser.add_argument('--run_cb', default=False, action='store_true', help='Whether to run causal bert or not.')
     parser.add_argument('--no-simulate', dest='simulate', default=True, action='store_false', help='Whether to simulate outcomes or not')
+    parser.add_argument('--q0_save_path', type=str, help='Path to save Q0 estimates')
+    parser.add_argument('--q1_save_path', type=str, help='Path to save Q1 estimates')
 
     args = parser.parse_args()
 
@@ -268,18 +273,25 @@ if __name__ == '__main__':
 
     out = {**vars(args), **{k: np.mean(v) for k, v in results.items()}}
 
-    print('Oracle:\t%.4f' % out['ate_T'])
-    print('Semi-Oracle:\t%.4f' % out['ate_matrix'])
-    print('Unadjusted:\t%.4f' % out['unadj_T_proxy'])
+    #print('Oracle:\t%.4f' % out['ate_T'])
+    #print('Semi-Oracle:\t%.4f' % out['ate_matrix'])
+    #print('Unadjusted:\t%.4f' % out['unadj_T_proxy'])
 
     # fixed the following 2 print statements
-    print('proxy-random:\t%.4f' % (out['ate_T_proxy_random']))
-    print('proxy-lex:\t%.4f' % (out['ate_T_proxy']))
+    #print('proxy-random:\t%.4f' % (out['ate_T_proxy_random']))
+    #print('proxy-lex:\t%.4f' % (out['ate_T_proxy']))
     
-    print('T-boost reg:\t%.4f' % out['ate_T_plus_reg'])
-    print('T-boost pu:\t%.4f' % out['ate_T_plus_pu'])
-    print('W adjust:\t%.4f' % out['ate_cb_T_proxy'])
-    print('TextCause pu:\t%.4f' % out['ate_cb_T_plus_pu'])
-    print('TextCause reg:\t%.4f' % out['ate_cb_T_plus_reg'])
+    #print('T-boost reg:\t%.4f' % out['ate_T_plus_reg'])
+    #print('T-boost pu:\t%.4f' % out['ate_T_plus_pu'])
+    #print('W adjust:\t%.4f' % out['ate_cb_T_proxy'])
+    #print('TextCause pu:\t%.4f' % out['ate_cb_T_plus_pu'][-1])
+    print('TextCause reg:\t%.4f' % out['ate_cb_T_plus_reg'][-1])
+    
+    # added to save CATe estimates
+    with open(args.q0_save_path, "w") as f:
+        pickle.dump(out['ate_cb_T_plus_reg'][0])
 
+    with open(args.q1_save_path, "w") as f:
+        pickle.dump(out['ate_cb_T_plus_reg'][1])
+        
     quit()
