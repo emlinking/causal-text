@@ -260,10 +260,10 @@ if __name__ == '__main__':
         args.seed = int(seed)
 
         # Hack to run random + lex
-        args.ptype = 'random'
-        args.run_cb = False
-        result_random = run_experiment(args)
-        results['ate_T_proxy_random'].append(result_random['ate_T_proxy'])
+        # args.ptype = 'random'
+        # args.run_cb = False
+        # result_random = run_experiment(args)
+        #results['ate_T_proxy_random'].append(result_random['ate_T_proxy'])
 
         args.ptype = 'lex'
         args.run_cb = True
@@ -293,5 +293,5 @@ if __name__ == '__main__':
 
     with open(args.q1_save_path, "w") as f:
         pickle.dump(out['ate_cb_T_plus_reg'][1])
-        
+
     quit()
