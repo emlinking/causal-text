@@ -288,10 +288,10 @@ if __name__ == '__main__':
     print('TextCause reg:\t%.4f' % out['ate_cb_T_plus_reg'][-1])
     
     # added to save CATe estimates
-    with open(args.q0_save_path, "w") as f:
+    with open(args.q0_save_path, "wb") as f:
         pickle.dump(out['ate_cb_T_plus_reg'][0], f)
 
-    with open(args.q1_save_path, "w") as f:
+    with open(args.q1_save_path, "wb") as f:
         pickle.dump(out['ate_cb_T_plus_reg'][1], f)
 
     quit()
