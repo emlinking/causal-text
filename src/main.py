@@ -269,9 +269,7 @@ if __name__ == '__main__':
         args.run_cb = True
         result = run_experiment(args)
         for k, v in result.items():
-            results[k] += [v]
-
-    out = {**vars(args), **{k: np.mean(v) for k, v in results.items()}}
+            results[k] += [v] # build list of results
 
     #print('Oracle:\t%.4f' % out['ate_T'])
     #print('Semi-Oracle:\t%.4f' % out['ate_matrix'])
@@ -285,13 +283,13 @@ if __name__ == '__main__':
     #print('T-boost pu:\t%.4f' % out['ate_T_plus_pu'])
     #print('W adjust:\t%.4f' % out['ate_cb_T_proxy'])
     #print('TextCause pu:\t%.4f' % out['ate_cb_T_plus_pu'][-1])
-    print('TextCause reg:\t%.4f' % out['ate_cb_T_plus_reg'][-1])
+    print('TextCause reg:\t%.4f' % results['ate_cb_T_plus_reg'][0][-1])
     
     # added to save CATe estimates
     with open(args.q0_save_path, "wb") as f:
-        pickle.dump(out['ate_cb_T_plus_reg'][0], f)
+        pickle.dump(results['ate_cb_T_plus_reg'][0][0], f)
 
     with open(args.q1_save_path, "wb") as f:
-        pickle.dump(out['ate_cb_T_plus_reg'][1], f)
+        pickle.dump(results['ate_cb_T_plus_reg'][0][1], f)
 
     quit()
